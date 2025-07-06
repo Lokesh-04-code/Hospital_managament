@@ -36,8 +36,8 @@ function RegistrationPage() {
     // API endpoint
     const url =
       registerAs === "Patient"
-        ? "http://localhost:5000/api/patients/register"
-        : "http://localhost:5000/api/doctor/register";
+        ? "https://hospital-backend-lojd.onrender.com/api/patients/register"
+        : "https://hospital-backend-lojd.onrender.com/api/doctor/register";
 
     // Payload based on role
     const payload =
