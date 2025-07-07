@@ -8,10 +8,35 @@ const DoctorDashBoard = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [todayAppointments, setTodayAppointments] = useState([]);
+  const [doctor, setDoctor] = useState({ name: "", speciality: "" });
+
+  // ✅ Fetch current doctor details from API
+  const fetchDoctorInfo = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        "https://hospital-backend-lojd.onrender.com/api/doctor/current",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to fetch doctor info");
+
+      const data = await response.json();
+      setDoctor({ name: data.name, speciality: data.speciality });
+    } catch (error) {
+      console.error("Error fetching doctor info:", error);
+      alert("Failed to load doctor information");
+    }
+  };
+
   const fetchAppointments = async () => {
     try {
-      const token = localStorage.getItem("token"); // Assuming you stored JWT in localStorage after login
-      console.log(token);
+      const token = localStorage.getItem("token");
       const response = await fetch(
         "https://hospital-backend-lojd.onrender.com/api/appointments/doctor",
         {
@@ -29,13 +54,13 @@ const DoctorDashBoard = () => {
 
       const data = await response.json();
       setAppointments(data.appointments);
-      console.log(data.appointments);
+
       const today = new Date().toISOString().split("T")[0];
       const filtered = data.appointments.filter((appt) => {
         const apptDate = new Date(appt.date).toISOString().split("T")[0];
         return apptDate === today;
       });
-      console.log(filtered);
+
       setTodayAppointments(filtered);
     } catch (error) {
       console.error("Error fetching doctor appointments:", error);
@@ -44,6 +69,7 @@ const DoctorDashBoard = () => {
       setLoading(false);
     }
   };
+
   const patientMap = appointments.reduce((acc, appt) => {
     const email = appt.patient?.email;
     if (email) {
@@ -55,17 +81,20 @@ const DoctorDashBoard = () => {
   const patientCount = Object.keys(patientMap).length;
 
   useEffect(() => {
+    fetchDoctorInfo();
     fetchAppointments();
   }, []);
+
   const upcomingAppointments = appointments.filter((appt) => {
     const appointmentDateTime = new Date(`${appt.date}T${appt.time}:00`);
-    return appointmentDateTime > new Date(); // Keep only future appointments
+    return appointmentDateTime > new Date();
   });
+
   return (
     <div className="bg-gray-100">
       <Header
-        name="lokesh"
-        speciality="cardio"
+        name={doctor.name}
+        speciality={doctor.speciality}
         head="Doctor"
         main="Stethoscope"
       />

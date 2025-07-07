@@ -10,7 +10,6 @@ import {
   Users,
   IndentIncreaseIcon,
   Shield,
-  
 } from "lucide-react"; // import all needed icons
 
 const icons = {
@@ -22,7 +21,6 @@ const icons = {
   Users: Users,
   increase: IndentIncreaseIcon,
   shield: Shield,
-
 
   // add more as needed
 };

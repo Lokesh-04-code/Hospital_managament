@@ -17,7 +17,34 @@ function PageTwo() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showBooking, setShowBooking] = useState(false);
+  const [patientName, setPatientName] = useState("");
 
+  // ✅ Fetch patient name
+  const fetchPatientInfo = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        "https://hospital-backend-lojd.onrender.com/api/patients/current",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!res.ok) throw new Error("Failed to fetch patient info");
+
+      const data = await res.json();
+      setPatientName(data.username || "User");
+    } catch (err) {
+      console.error("Error fetching patient info:", err);
+      setPatientName("User");
+    }
+  };
+
+  // ✅ Fetch appointments
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
@@ -38,7 +65,6 @@ function PageTwo() {
         }
 
         const data = await response.json();
-        console.log("Fetched:", data);
 
         const formattedData = data.appointments.map((appt) => {
           const appointmentDateTime = new Date(`${appt.date}T${appt.time}:00`);
@@ -65,7 +91,8 @@ function PageTwo() {
       }
     };
 
-    fetchAppointments();
+    fetchPatientInfo(); // 👈 fetch name
+    fetchAppointments(); // 👈 fetch appointments
   }, []);
 
   if (showBooking) {
@@ -75,7 +102,7 @@ function PageTwo() {
   return (
     <div className="bg-green-100 min-h-screen">
       <div className="max-w-5xl mx-auto px-4 py-4 space-y-6">
-        <Header name="lokesh" head="Patient" main="User" />
+        <Header name={patientName} head="Patient" main="User" />
         <QuickActions setShowBooking={setShowBooking} />
         <CustomTable
           title="Your Appointments"

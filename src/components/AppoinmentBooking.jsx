@@ -64,10 +64,28 @@ const AppointmentBooking = ({ onBack }) => {
 
   const getAvailableTimeSlots = () => {
     const selectedDoctor = doctors.find((doc) => doc._id === formData.doctor);
-    const dateSlots = selectedDoctor?.dailySlots?.find(
+    const today = new Date().toISOString().split("T")[0];
+
+    if (!formData.date || !selectedDoctor) return [];
+
+    const dateSlots = selectedDoctor.dailySlots?.find(
       (slot) => slot.date === formData.date
     );
-    return dateSlots?.slots?.filter((s) => !s.isBooked) || [];
+
+    if (!dateSlots) return [];
+
+    return dateSlots.slots.filter((slot) => {
+      if (slot.isBooked) return false;
+
+      // If the selected date is today, filter out past times
+      if (formData.date === today) {
+        const now = new Date();
+        const slotTime = new Date(`${formData.date}T${slot.time}:00`);
+        return slotTime > now;
+      }
+
+      return true; // Allow all future dates' unbooked slots
+    });
   };
 
   const doSubmit = async () => {
@@ -251,6 +269,7 @@ const AppointmentBooking = ({ onBack }) => {
               Select Date & Time
             </h2>
 
+            {/* Date Picker */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 <Calendar className="inline w-4 h-4 mr-2" />
@@ -265,6 +284,7 @@ const AppointmentBooking = ({ onBack }) => {
               />
             </div>
 
+            {/* Time Slots */}
             {formData.date && (
               <div>
                 <label className="block text-sm font-medium text-gray-700">
@@ -294,6 +314,7 @@ const AppointmentBooking = ({ onBack }) => {
               </div>
             )}
 
+            {/* Navigation Buttons */}
             <div className="flex gap-4">
               <button
                 onClick={() => setStep(1)}

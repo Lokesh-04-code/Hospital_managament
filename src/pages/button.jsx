@@ -64,7 +64,9 @@ function Button({ role, email, password }) {
       <button
         type="button"
         onClick={log}
-        className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold py-2 px-6 sm:px-8 rounded-lg cursor-pointer text-sm sm:text-base"
+        className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold py-2 px-6 sm:px-8 rounded-lg cursor-pointer text-sm sm:text-base
+    transition duration-300 ease-in-out
+    active:opacity-70 active:scale-95"
       >
         Login
       </button>
